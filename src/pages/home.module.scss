@@ -1,1 +1,41 @@
-// TODO
+.main {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    // height: calc(100vh - 10rem);
+
+    display:  flex;
+    align-items: center;
+    flex-direction: column;
+    
+    justify-content: space-between;
+    
+    main {
+        width: 100%;
+        article {
+            margin-top: 3rem;
+
+            a {
+                strong {
+                    font-size: 1.75rem;
+                    font-weight: 600;
+                }
+    
+                p {
+                    font-size: 1.125rem;
+                    font-weight: 400;
+                    color: var(--Body);
+                }
+    
+                section {
+                    display: flex;
+                    align-items: center;
+    
+                    div {
+                        margin-left: 1.5rem;
+                    }
+                }
+            }
+        }
+    }
+}

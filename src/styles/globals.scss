@@ -4,4 +4,50 @@
   padding: 0;
 }
 
-// TODO
+:root {
+  --Highlight: #FF57B2;
+  --Heading: #F8F8F8;
+  --Background: #1A1D23;
+  --Info: #BBBBBB;
+  --Body: #D7D7D7;
+}
+
+html {
+  @media(max-width: 1080px) {
+    font-size: 93.75%;
+  }
+  
+  @media(max-width: 720px) {
+    font-size: 87.5%;
+  }
+}
+
+body,input,select,textarea,button {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+}
+
+h1, h2, h3, h4, h5, h6, strong {
+  font-weight: 600;
+}
+
+body {
+  background: var(--Background);
+  color: var(--Heading);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+}
+
+a { 
+  color: inherit;
+  text-decoration: none;
+}
+
+[disabled] {
+  opacity:0.6;
+  cursor: not-allowed;
+}
