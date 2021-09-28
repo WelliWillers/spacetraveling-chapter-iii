@@ -5,37 +5,65 @@
     // height: calc(100vh - 10rem);
 
     display:  flex;
-    align-items: center;
+    align-items: left;
     flex-direction: column;
     
     justify-content: space-between;
+    transition-duration: color 0.5s;
     
     main {
         width: 100%;
-        article {
-            margin-top: 3rem;
+        a {
+            article {
+                cursor: pointer;
+                margin-top: 3rem;
 
-            a {
                 strong {
                     font-size: 1.75rem;
                     font-weight: 600;
+                    display: block;
+                    margin-bottom: .75rem;
                 }
-    
+
                 p {
                     font-size: 1.125rem;
                     font-weight: 400;
                     color: var(--Body);
+                    margin-bottom: 1.75rem;
                 }
-    
+
                 section {
                     display: flex;
                     align-items: center;
-    
-                    div {
-                        margin-left: 1.5rem;
+                    gap: 1.5rem;
+                    color: var(--Body);
+
+                    time, div {
+                        display: flex;
+                        gap: .5rem;
+                    }
+                }
+
+                &:hover {
+                    strong {
+                        color: var(--Highlight);
                     }
                 }
             }
+        }
+    }
+
+    button {
+        color: var(--Highlight);
+        font-size: 1.125rem;
+        background: transparent;
+        border: none;
+        font-weight: 600;
+        width: fit-content;
+        margin: 2rem 0;
+
+        &:hover {
+            color: var(--Info)
         }
     }
 }

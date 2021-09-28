@@ -1,9 +1,15 @@
-import { GetStaticProps } from 'next';
 import Link from 'next/link';
+import { GetStaticProps } from 'next';
+
+import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../services/prismic';
 
-import commonStyles from '../styles/common.module.scss';
+
 import styles from './home.module.scss';
+import { FiCalendar, FiUser } from "react-icons/fi";
+import commonStyles from '../styles/common.module.scss';
+import { useEffect, useState } from 'react';
+import { Head } from 'next/document';
 
 interface Post {
   uid?: string;
@@ -24,55 +30,120 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home() {
+export default function Home({postsPagination}: HomeProps) {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [nextPage, setNextPage] = useState('');
+
+  console.log(postsPagination);
+
+  useEffect(() => {
+    setPosts(postsPagination.results);
+    setNextPage(postsPagination.next_page);
+  }, [postsPagination.results, postsPagination.next_page]);
+
+  // tratar se tem ou não posts
+
+  // carregando mais posts
+  function handleOpenMorePosts () {
+    fetch(nextPage)
+      .then(res => res.json())
+      .then(data => {
+        const formattedData = data.results.map(post => {
+          return {
+            uid: post.uid,
+            first_publication_date: new Date(post.last_publication_date).toLocaleDateString('pt-BR', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric',
+            }),
+            data: {
+              title: post.data.title,
+              subtitle: post.data.subtitle,
+              author: post.data.author,
+            },
+          };
+        });
+
+        setPosts([...posts, ...formattedData]);
+        setNextPage(data.next_page);
+      });
+  }
+
   return (
     <>
+      <Head>
+        <title>Home | Space Traveling</title>
+      </Head>
+      
       <div className={`${styles.main} ${commonStyles.mainPosition}`}>
         <main>
-          <Link href="#0">
-            <article>
-              <a >
-                <strong>Como utilizar Hooks</strong>
-                <p>Pensando em sincronização em vez de ciclos de vida.</p>
-                <section>
-                  <time>
-                    15 Mar 2021  
-                  </time>
-                  <div>
-                    Wellington Willers
-                  </div>
-                </section>
-              </a>
-            </article>
-          </Link>
-          <Link href="#0">
-            <article>
-              <a >
-                <strong>Como utilizar Hooks</strong>
-                <p>Pensando em sincronização em vez de ciclos de vida.</p>
-                <section>
-                  <time>
-                    15 Mar 2021  
-                  </time>
-                  <div>
-                    Wellington Willers
-                  </div>
-                </section>
-              </a>
-            </article>
-          </Link>
+          {
+            posts.map(post => (
+              <Link key={post.uid} href={`/posts/${post.uid}`}>
+                <a>
+                  <article>
+                      <strong>{post.data.title}</strong>
+                      <p>{post.data.subtitle}</p>
+                      <section>
+                        <time>
+                          <FiCalendar />
+                          {post.first_publication_date}
+                        </time>
+                        <div>
+                          <FiUser />
+                          {post.data.author}
+                        </div>
+                      </section>
+                  </article>
+                </a>
+              </Link>
+              )
+            )
+          }
         </main>
-
-        <button>Carregar mais posts</button>
+        {
+          nextPage &&
+          (
+            <button type="button" onClick={handleOpenMorePosts} >Carregar mais posts</button>
+          )
+          
+        }
       </div>
-
     </>
   );
 }
 
-// export const getStaticProps = async () => {
-//   // const prismic = getPrismicClient();
-//   // const postsResponse = await prismic.query(TODO);
+export const getStaticProps: GetStaticProps = async () => {
+  const prismic = getPrismicClient();
 
-//   // TODO
-// };
+  const response = await prismic.query([
+    Prismic.predicates.at('document.type', 'posts')
+  ], {
+    fetch: ['post.title', 'post.subtitle', 'post.author'],
+    pageSize: 1,
+  });
+
+  const posts = response.results.map(post => {
+    return {
+      uid: post.uid,
+      first_publication_date: post.last_publication_date,
+      data: {
+        title: post.data.title,
+        subtitle: post.data.subtitle,
+        author: post.data.author,
+      }
+    }
+  })
+
+  return {
+    props: {
+      postsPagination: {
+        next_page: response.next_page,
+        results: {
+          posts: posts
+        }
+      }
+    },
+  };
+
+};
