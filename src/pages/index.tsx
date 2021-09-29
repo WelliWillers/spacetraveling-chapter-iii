@@ -9,7 +9,10 @@ import styles from './home.module.scss';
 import { FiCalendar, FiUser } from "react-icons/fi";
 import commonStyles from '../styles/common.module.scss';
 import { useEffect, useState } from 'react';
-import { Head } from 'next/document';
+import Head from 'next/head';
+
+import { format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 
 interface Post {
   uid?: string;
@@ -34,14 +37,10 @@ export default function Home({postsPagination}: HomeProps) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [nextPage, setNextPage] = useState('');
 
-  console.log(postsPagination);
-
   useEffect(() => {
     setPosts(postsPagination.results);
     setNextPage(postsPagination.next_page);
   }, [postsPagination.results, postsPagination.next_page]);
-
-  // tratar se tem ou não posts
 
   // carregando mais posts
   function handleOpenMorePosts () {
@@ -51,11 +50,7 @@ export default function Home({postsPagination}: HomeProps) {
         const formattedData = data.results.map(post => {
           return {
             uid: post.uid,
-            first_publication_date: new Date(post.last_publication_date).toLocaleDateString('pt-BR', {
-              day: '2-digit',
-              month: 'long',
-              year: 'numeric',
-            }),
+            first_publication_date: post.first_publication_date,
             data: {
               title: post.data.title,
               subtitle: post.data.subtitle,
@@ -75,11 +70,11 @@ export default function Home({postsPagination}: HomeProps) {
         <title>Home | Space Traveling</title>
       </Head>
       
-      <div className={`${styles.main} ${commonStyles.mainPosition}`}>
+      <div className={`${styles.main}`}>
         <main>
           {
             posts.map(post => (
-              <Link key={post.uid} href={`/posts/${post.uid}`}>
+              <Link key={post.uid} href={`/post/${post.uid}`}>
                 <a>
                   <article>
                       <strong>{post.data.title}</strong>
@@ -87,7 +82,13 @@ export default function Home({postsPagination}: HomeProps) {
                       <section>
                         <time>
                           <FiCalendar />
-                          {post.first_publication_date}
+                          { format(
+                            new Date(post.first_publication_date),
+                            'dd MMM yyyy',
+                            {
+                              locale: ptBR,
+                            }
+                          ) }
                         </time>
                         <div>
                           <FiUser />
@@ -101,13 +102,14 @@ export default function Home({postsPagination}: HomeProps) {
             )
           }
         </main>
-        {
-          nextPage &&
+
+
+        { nextPage &&
           (
-            <button type="button" onClick={handleOpenMorePosts} >Carregar mais posts</button>
+            <button type="button" onClick={handleOpenMorePosts}> Carregar mais posts </button>
           )
-          
         }
+
       </div>
     </>
   );
@@ -126,7 +128,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const posts = response.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: post.last_publication_date,
+      first_publication_date: post.first_publication_date,
       data: {
         title: post.data.title,
         subtitle: post.data.subtitle,
@@ -135,15 +137,16 @@ export const getStaticProps: GetStaticProps = async () => {
     }
   })
 
+  const postsPagination = {
+    next_page: response.next_page,
+    results: posts
+  }
+
   return {
     props: {
-      postsPagination: {
-        next_page: response.next_page,
-        results: {
-          posts: posts
-        }
-      }
+      postsPagination
     },
+    revalidate: 60 * 60,//1 hora
   };
 
 };
