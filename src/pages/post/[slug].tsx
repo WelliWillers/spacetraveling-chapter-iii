@@ -47,8 +47,13 @@ export default function Post({post}: PostProps) {
         <title>{post.data.title} | Space Traveling</title> 
       </Head>
 
-      <main className={styles.container}>
+      <div className={styles.banner}>
+        <img src={post.data.banner.url} alt="Imagem superior" />
+      </div>
+
+      <main className={`${commonStyles.containerWidth}`}>
         <article className={styles.post}>
+          <h1>{post.data.title}</h1>
           <h1>{post.data.title}</h1>
           <time>
             {format(
@@ -59,6 +64,7 @@ export default function Post({post}: PostProps) {
               }
             )}
           </time>
+          <p>{post.data.author}</p>
           {post.data.content.map(content => (
             <Fragment key={content.heading}>
               <h2>{content.heading}</h2>

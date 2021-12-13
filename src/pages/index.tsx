@@ -70,7 +70,7 @@ export default function Home({postsPagination}: HomeProps) {
         <title>Home | Space Traveling</title>
       </Head>
       
-      <div className={`${styles.main}`}>
+      <div className={`${styles.main}  ${commonStyles.containerWidth}`}>
         <main>
           {
             posts.map(post => (
