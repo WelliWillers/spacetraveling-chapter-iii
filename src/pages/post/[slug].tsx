@@ -11,6 +11,7 @@ import styles from './post.module.scss';
 import { useRouter } from 'next/router';
 import { Fragment } from 'react';
 import { RichText } from 'prismic-dom';
+import { FiClock } from 'react-icons/fi';
 
 interface Post {
   first_publication_date: string | null;
@@ -37,6 +38,19 @@ export default function Post({post}: PostProps) {
   
   const router = useRouter();
 
+  // const totalWords = post.data.content.reduce((total, contentItem) => {
+  //   total += contentItem.heading.split(' ').length; // all 'heading' words
+
+  //   const words = contentItem.body.map(item => item.text.split(' ').length); // all 'body' words
+  //   words.map(word => (total += word));
+
+  //   return total;
+  // }, 0);
+
+  // console.log(totalWords);
+
+  // const readTime = Math.ceil(totalWords / 200);
+
   if(router.isFallback){
     return <h1>Carregando...</h1>
   }
@@ -54,7 +68,6 @@ export default function Post({post}: PostProps) {
       <main className={`${commonStyles.containerWidth}`}>
         <article className={styles.post}>
           <h1>{post.data.title}</h1>
-          <h1>{post.data.title}</h1>
           <time>
             {format(
               new Date(post.first_publication_date),
@@ -64,7 +77,12 @@ export default function Post({post}: PostProps) {
               }
             )}
           </time>
+          <p>
+            <FiClock />
+              {/* {readTime} min */}
+          </p>
           <p>{post.data.author}</p>
+
           {post.data.content.map(content => (
             <Fragment key={content.heading}>
               <h2>{content.heading}</h2>
